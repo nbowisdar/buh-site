@@ -15,6 +15,13 @@
       "when": 1763314318588,
       "tag": "0001_classy_ikaris",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1763317807823,
+      "tag": "0002_lyrical_squirrel_girl",
+      "breakpoints": true
     }
   ]
 }

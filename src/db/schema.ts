@@ -1,4 +1,4 @@
-import { integer, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core"
+import { boolean, integer, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core"
 
 export const comments = pgTable("comments", {
 	id: serial("id").primaryKey(),
@@ -22,6 +22,17 @@ export const priceRow = pgTable("price_row", {
 	price: text().notNull(),
 	priceId: integer("price_id").references(() => price.id, { onDelete: "cascade" }),
 })
+
+export const feedbackLinks = pgTable("feedback_links", {
+	id: serial("id").primaryKey(),
+	token: text().notNull(),
+	is_used: boolean().notNull().default(false),
+	createdAt: timestamp("created_at").defaultNow(),
+})
+
+// Types for feedbackLinks
+export type FeedbackLinkInsert = typeof feedbackLinks.$inferInsert
+export type FeedbackLink = typeof feedbackLinks.$inferSelect
 
 // Types for comments
 export type CommentInsert = typeof comments.$inferInsert
