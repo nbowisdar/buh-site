@@ -6,7 +6,7 @@ import TanStackQueryDevtools from "../integrations/tanstack-query/devtools"
 
 import appCss from "../styles.css?url"
 
-import Header from "@/components/Header"
+import Header from "@/components/header"
 import Footer from "@/components/footer"
 import type { QueryClient } from "@tanstack/react-query"
 
@@ -25,7 +25,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 				content: "width=device-width, initial-scale=1",
 			},
 			{
-				title: "Virox Audit",
+				title: "Virox ",
 			},
 		],
 		links: [
