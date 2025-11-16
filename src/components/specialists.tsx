@@ -7,15 +7,15 @@ const specialists = [
 		name: "Олена Коваленко",
 		position: "Головний бухгалтер",
 		experience: "15 років досвіду в бухгалтерському обліку. Експерт з міжнародних стандартів фінансової звітності (МСФЗ).",
-		photo: "/professional-accountant-woman-portrait.jpg",
-		diploma: "/accounting-diploma-certificate.jpg",
+		photo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRr9nyoara5KVnszSqYeqSCQ488hwAXWLYvbQ&s",
+		diploma: "https://shop.brt.com.ua/image/cache/catalog/nagrady/professii/diplom-patriota-brt-1000x1340.jpg",
 	},
 	{
 		id: 2,
 		name: "Андрій Петренко",
 		position: "Податковий консультант",
 		experience: "12 років досвіду в податковому консалтингу. Спеціаліст з податкової оптимізації та аудиту.",
-		photo: "/professional-accountant-man-portrait.jpg",
+		photo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSwxNVQ137tcEgOGigtL51ZsSzPoDuSvkk1TQ&s",
 		diploma: "/tax-consultant-diploma-certificate.jpg",
 	},
 	{
@@ -23,7 +23,7 @@ const specialists = [
 		name: "Марія Шевченко",
 		position: "Фінансовий аналітик",
 		experience: "10 років досвіду в фінансовому аналізі. Експерт з фінансового планування та бюджетування.",
-		photo: "/professional-financial-analyst-woman-portrait.jpg",
+		photo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnTk_p7r1rSdBDx_YZd93aAD9JxoUaTnHB1Q&s",
 		diploma: "/financial-analyst-diploma-certificate.jpg",
 	},
 ]
@@ -92,7 +92,7 @@ export default function Specialists() {
 									>
 										✕
 									</button>
-									<div className="relative h-[600px]">
+									<div className="relative h-[600px] bg-muted flex items-center justify-center">
 										<Image
 											width={400}
 											height={300}
