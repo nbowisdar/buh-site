@@ -4,6 +4,9 @@ import { Check, Copy } from "lucide-react"
 import { useEffect, useState } from "react"
 
 export const Route = createFileRoute("/admin")({
+	loader: async () => {
+		// TODO load all data here.
+	},
 	component: RouteComponent,
 })
 
