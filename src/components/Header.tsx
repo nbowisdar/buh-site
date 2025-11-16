@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router"
+import { Image } from "@unpic/react"
 import { useState } from "react"
 import ThemeSwitcher from "./mode-toggle"
 
@@ -8,8 +9,10 @@ export default function Header() {
 	return (
 		<nav className="bg-primary text-primary-foreground sticky top-0 z-50 shadow-sm">
 			<div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-				<Link to="/" className="text-2xl font-bold">
-					Virox Audit
+				<Link to="/" className="text-2xl font-bold flex items-center">
+					<div className="w-auto overflow-visible">
+						<Image src="/logo.png" alt="Virox Audit" width={150} height={200} />
+					</div>
 				</Link>
 
 				<button className="md:hidden" onClick={() => setIsOpen(!isOpen)}>
