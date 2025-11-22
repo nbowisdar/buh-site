@@ -29,3 +29,8 @@ export const updateStatusFeedbackFunc = createServerFn({ method: "POST" })
 		const result = await db.update(feedbackLinks).set({ is_used: status }).where(eq(feedbackLinks.id, id))
 		console.log(result)
 	})
+
+export const generateFeedbackFunc = createServerFn({ method: "POST" }).handler(async () => {
+	const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+	await db.insert(feedbackLinks).values({ token })
+})

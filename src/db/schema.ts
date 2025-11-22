@@ -1,5 +1,7 @@
 import { boolean, integer, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core"
 
+import { relations } from "drizzle-orm"
+
 export const comments = pgTable("comments", {
 	id: serial("id").primaryKey(),
 	name: text().notNull(),
@@ -45,3 +47,18 @@ export type Price = typeof price.$inferSelect
 // Types for priceRow
 export type PriceRowInsert = typeof priceRow.$inferInsert
 export type PriceRow = typeof priceRow.$inferSelect
+
+export type PriceFull = PriceInsert & {
+	rows: PriceRowInsert[]
+}
+
+export const priceRelations = relations(price, ({ many }) => ({
+	rows: many(priceRow),
+}))
+
+export const priceRowRelations = relations(priceRow, ({ one }) => ({
+	parent: one(price, {
+		fields: [priceRow.priceId],
+		references: [price.id],
+	}),
+}))

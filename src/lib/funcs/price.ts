@@ -1,5 +1,5 @@
 import { db } from "@/db/index"
-import { PriceInsert, PriceRowInsert, price, priceRow } from "@/db/schema"
+import { PriceFull, PriceInsert, PriceRow, PriceRowInsert, price, priceRow } from "@/db/schema"
 import { createServerFn } from "@tanstack/react-start"
 import { eq } from "drizzle-orm"
 
@@ -39,6 +39,26 @@ export const deletePriceRowFunc = createServerFn({ method: "POST" })
 
 export const getAllPriceRowFunc = createServerFn({ method: "GET" }).handler(async () => {
 	console.log("Loading price rows from server")
-	const response = await db.select().from(priceRow)
-	return response
+	return await db.select().from(priceRow)
 })
+
+export const addPriceFullFunc = createServerFn({ method: "POST" })
+	.inputValidator((data: PriceFull) => data)
+	.handler(async ({ data }) => {
+		console.log("Server fn called with:", data)
+		const res = await db.insert(price).values({ title: data.title }).returning()
+		const priceId = res[0].id
+		const rows = data.rows.map((row) => ({ ...row, priceId }))
+		await db.insert(priceRow).values(rows)
+	})
+
+export const getAllPriceFullFunc = createServerFn({ method: "GET" }).handler(async () => {
+	// const rows = await db.select().from(price).leftJoin(priceRow, eq(price.id, priceRow.priceId))
+	return await db.query.price.findMany({
+		with: {
+			rows: true,
+		},
+	})
+})
+
+

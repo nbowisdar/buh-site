@@ -1,5 +1,6 @@
 import { deleteCommentFunc, getAllCommentFunc } from "@/lib/funcs/comments"
-import { getAllFeedbackFunc } from "@/lib/funcs/feedbacksLinks"
+import { deleteFeedbackFunc, generateFeedbackFunc, getAllFeedbackFunc } from "@/lib/funcs/feedbacksLinks"
+import { addPriceFullFunc, deletePriceFunc, getAllPriceFullFunc } from "@/lib/funcs/price"
 import { formatDate } from "@/lib/misk"
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
 
@@ -8,35 +9,34 @@ import { useEffect, useState } from "react"
 
 export const Route = createFileRoute("/admin")({
 	loader: async () => {
-		const feedbacks = await getAllFeedbackFunc()
+		const feedbackLinks = await getAllFeedbackFunc()
 		const comments = await getAllCommentFunc()
-		return { comments, feedbacks }
+		const pricingTables = await getAllPriceFullFunc()
+		return { comments, feedbackLinks, pricingTables }
 	},
 	component: RouteComponent,
 })
 
 interface PricingTable {
-	id: string
+	id: number
 	title: string
-	services: { name: string; price: string }[]
+	rows: { name: string; price: string }[]
 }
 
 function RouteComponent() {
-	const { comments, feedbacks } = Route.useLoaderData()
+	const { comments, feedbackLinks, pricingTables } = Route.useLoaderData()
 	const router = useRouter()
 
 	const [isAuthenticated, setIsAuthenticated] = useState(false)
 	const [password, setPassword] = useState("")
 	const [deleteMessage, setDeleteMessage] = useState("")
 	const [activeTab, setActiveTab] = useState<"feedbacks" | "pricing">("feedbacks")
-	const [pricingTables, setPricingTables] = useState<PricingTable[]>([])
 	const [showTableForm, setShowTableForm] = useState(false)
 	const [editingTable, setEditingTable] = useState<PricingTable | null>(null)
 	const [tableFormData, setTableFormData] = useState({
 		title: "",
-		services: [{ name: "", price: "" }],
+		rows: [{ name: "", price: "" }],
 	})
-	const [feedbackLinks, setFeedbackLinks] = useState<{ id: string; token: string; createdAt: number; used: boolean }[]>([])
 	const [copiedToken, setCopiedToken] = useState<string | null>(null)
 
 	const ADMIN_PASSWORD = "admin123"
@@ -45,21 +45,8 @@ function RouteComponent() {
 		const auth = localStorage.getItem("adminAuth")
 		if (auth === "true") {
 			setIsAuthenticated(true)
-			loadData()
 		}
 	}, [])
-
-	const loadData = () => {
-		const storedTables = localStorage.getItem("pricingTables")
-		if (storedTables) {
-			setPricingTables(JSON.parse(storedTables))
-		}
-
-		const storedLinks = localStorage.getItem("feedbackLinks")
-		if (storedLinks) {
-			setFeedbackLinks(JSON.parse(storedLinks))
-		}
-	}
 
 	const handleLogin = (e: React.FormEvent) => {
 		e.preventDefault()
@@ -67,7 +54,6 @@ function RouteComponent() {
 			localStorage.setItem("adminAuth", "true")
 			setIsAuthenticated(true)
 			setPassword("")
-			loadData()
 		} else {
 			alert("Неправильний пароль!")
 			setPassword("")
@@ -78,8 +64,6 @@ function RouteComponent() {
 		localStorage.removeItem("adminAuth")
 		setIsAuthenticated(false)
 		setPassword("")
-		setPricingTables([])
-		setFeedbackLinks([])
 	}
 
 	const handleDeleteFeedback = async (id: number) => {
@@ -89,19 +73,9 @@ function RouteComponent() {
 		}
 	}
 
-	const handleGenerateFeedbackLink = () => {
-		const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
-		const newLink = {
-			id: Date.now().toString(),
-			token,
-			createdAt: Date.now(),
-			used: false,
-		}
-		const updatedLinks = [...feedbackLinks, newLink]
-		setFeedbackLinks(updatedLinks)
-		localStorage.setItem("feedbackLinks", JSON.stringify(updatedLinks))
-		setDeleteMessage("Посилання для відгуку згенеровано!")
-		setTimeout(() => setDeleteMessage(""), 3000)
+	const handleGenerateFeedbackLink = async () => {
+		await generateFeedbackFunc()
+		router.invalidate()
 	}
 
 	const handleCopyLink = (token: string) => {
@@ -111,35 +85,32 @@ function RouteComponent() {
 		setTimeout(() => setCopiedToken(null), 2000)
 	}
 
-	const handleDeleteLink = (id: string) => {
+	const handleDeleteLink = async (id: number) => {
 		if (confirm("Ви впевнені, що хочете видалити це посилання?")) {
-			const updatedLinks = feedbackLinks.filter((l) => l.id !== id)
-			setFeedbackLinks(updatedLinks)
-			localStorage.setItem("feedbackLinks", JSON.stringify(updatedLinks))
-			setDeleteMessage("Посилання видалено!")
-			setTimeout(() => setDeleteMessage(""), 3000)
+			await deleteFeedbackFunc({ data: { id } })
+			router.invalidate()
 		}
 	}
 
 	const handleAddService = () => {
 		setTableFormData({
 			...tableFormData,
-			services: [...tableFormData.services, { name: "", price: "" }],
+			rows: [...tableFormData.rows, { name: "", price: "" }],
 		})
 	}
 
 	const handleRemoveService = (index: number) => {
-		const newServices = tableFormData.services.filter((_, i) => i !== index)
-		setTableFormData({ ...tableFormData, services: newServices })
+		const newServices = tableFormData.rows.filter((_, i) => i !== index)
+		setTableFormData({ ...tableFormData, rows: newServices })
 	}
 
 	const handleServiceChange = (index: number, field: "name" | "price", value: string) => {
-		const newServices = tableFormData.services.map((service, i) => (i === index ? { ...service, [field]: value } : service))
-		setTableFormData({ ...tableFormData, services: newServices })
+		const newServices = tableFormData.rows.map((row, i) => (i === index ? { ...row, [field]: value } : row))
+		setTableFormData({ ...tableFormData, rows: newServices })
 	}
 
 	const handleSaveTable = () => {
-		if (!tableFormData.title || tableFormData.services.some((s) => !s.name || !s.price)) {
+		if (!tableFormData.title || tableFormData.rows.some((s) => !s.name || !s.price)) {
 			alert("Будь ласка, заповніть всі поля")
 			return
 		}
@@ -150,51 +121,40 @@ function RouteComponent() {
 					? {
 							...editingTable,
 							title: tableFormData.title,
-							services: tableFormData.services,
+							rows: tableFormData.rows,
 						}
 					: t
 			)
-			setPricingTables(updatedTables)
 			localStorage.setItem("pricingTables", JSON.stringify(updatedTables))
 			setDeleteMessage("Таблицю оновлено успішно!")
 		} else {
-			const newTable: PricingTable = {
-				id: Date.now().toString(),
-				title: tableFormData.title,
-				services: tableFormData.services,
-			}
-			const updatedTables = [...pricingTables, newTable]
-			setPricingTables(updatedTables)
-			localStorage.setItem("pricingTables", JSON.stringify(updatedTables))
+			addPriceFullFunc({ data: tableFormData })
 			setDeleteMessage("Таблицю додано успішно!")
 		}
 
 		setShowTableForm(false)
 		setEditingTable(null)
-		setTableFormData({ title: "", services: [{ name: "", price: "" }] })
+		setTableFormData({ title: "", rows: [{ name: "", price: "" }] })
 		setTimeout(() => setDeleteMessage(""), 3000)
 	}
 
 	const handleEditTable = (table: PricingTable) => {
 		setEditingTable(table)
-		setTableFormData({ title: table.title, services: [...table.services] })
+		setTableFormData({ title: table.title, rows: [...table.rows] })
 		setShowTableForm(true)
 	}
 
-	const handleDeleteTable = (id: string) => {
+	const handleDeleteTable = async (id: number) => {
 		if (confirm("Ви впевнені, що хочете видалити цю таблицю?")) {
-			const updatedTables = pricingTables.filter((t) => t.id !== id)
-			setPricingTables(updatedTables)
-			localStorage.setItem("pricingTables", JSON.stringify(updatedTables))
-			setDeleteMessage("Таблицю видалено успішно!")
-			setTimeout(() => setDeleteMessage(""), 3000)
+			await deletePriceFunc({ data: { id } })
+			router.invalidate()
 		}
 	}
 
 	const handleCancelTableForm = () => {
 		setShowTableForm(false)
 		setEditingTable(null)
-		setTableFormData({ title: "", services: [{ name: "", price: "" }] })
+		setTableFormData({ title: "", rows: [{ name: "", price: "" }] })
 	}
 
 	return (
@@ -267,7 +227,7 @@ function RouteComponent() {
 													{`${typeof window !== "undefined" ? window.location.origin : ""}/leave-feedback?token=${link.token}`}
 												</p>
 												<p className="text-xs text-foreground/60 mt-1">
-													Створено: {formatDate(link.createdAt)} • {link.used ? "Використано" : "Не використано"}
+													Створено: {formatDate(link.createdAt)} • {link.is_used ? "Використано" : "Не використано"}
 												</p>
 											</div>
 											<div className="flex gap-2 ml-4">
@@ -416,7 +376,7 @@ function RouteComponent() {
 												</div>
 
 												<div className="space-y-3">
-													{tableFormData.services.map((service, index) => (
+													{tableFormData.rows.map((service, index) => (
 														<div key={index} className="flex gap-2">
 															<input
 																type="text"
@@ -432,7 +392,7 @@ function RouteComponent() {
 																className="w-40 px-4 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
 																placeholder="Ціна"
 															/>
-															{tableFormData.services.length > 1 && (
+															{tableFormData.rows.length > 1 && (
 																<button
 																	type="button"
 																	onClick={() => handleRemoveService(index)}
@@ -494,7 +454,7 @@ function RouteComponent() {
 															</tr>
 														</thead>
 														<tbody>
-															{table.services.map((service, idx) => (
+															{table.rows.map((service, idx) => (
 																<tr key={idx} className="border-b border-border/50">
 																	<td className="py-2 text-sm text-foreground">{service.name}</td>
 																	<td className="py-2 text-sm text-right font-semibold text-primary">{service.price}</td>
