@@ -1,5 +1,5 @@
 import { db } from "@/db/index"
-import { CommentInsert, comments } from "@/db/schema"
+import { type CommentInsert, comments } from "@/db/schema"
 import { createServerFn } from "@tanstack/react-start"
 import { eq } from "drizzle-orm"
 
@@ -8,6 +8,7 @@ export const addCommentFunc = createServerFn({ method: "POST" })
 	.handler(async ({ data }) => {
 		console.log("Server fn called with:", data)
 		await db.insert(comments).values(data)
+		console.log("After")
 	})
 
 export const deleteCommentFunc = createServerFn({ method: "POST" })
@@ -19,6 +20,5 @@ export const deleteCommentFunc = createServerFn({ method: "POST" })
 
 export const getAllCommentFunc = createServerFn({ method: "GET" }).handler(async () => {
 	console.log("Loading comments from server")
-	const response = await db.select().from(comments)
-	return response[0]
+	return await db.select().from(comments)
 })

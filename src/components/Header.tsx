@@ -15,7 +15,7 @@ export default function Header() {
 					</div>
 				</Link>
 
-				<button className="md:hidden" onClick={() => setIsOpen(!isOpen)}>
+				<button type="button" className="md:hidden" onClick={() => setIsOpen(!isOpen)}>
 					☰
 				</button>
 

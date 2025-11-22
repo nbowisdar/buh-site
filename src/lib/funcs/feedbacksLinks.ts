@@ -19,8 +19,7 @@ export const deleteFeedbackFunc = createServerFn({ method: "POST" })
 
 export const getAllFeedbackFunc = createServerFn({ method: "GET" }).handler(async () => {
 	console.log("Loading feedbackLinks from server")
-	const response = await db.select().from(feedbackLinks)
-	return response[0]
+	return await db.select().from(feedbackLinks)
 })
 
 export const updateStatusFeedbackFunc = createServerFn({ method: "POST" })

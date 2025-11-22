@@ -1,36 +1,19 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { deleteCommentFunc, getAllCommentFunc } from "@/lib/funcs/comments"
+import { getAllFeedbackFunc } from "@/lib/funcs/feedbacksLinks"
+import { formatDate } from "@/lib/misk"
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
 
 import { Check, Copy } from "lucide-react"
 import { useEffect, useState } from "react"
 
 export const Route = createFileRoute("/admin")({
 	loader: async () => {
-		// TODO load all data here.
+		const feedbacks = await getAllFeedbackFunc()
+		const comments = await getAllCommentFunc()
+		return { comments, feedbacks }
 	},
 	component: RouteComponent,
 })
-
-interface Feedback {
-	id: string
-	name: string
-	company: string
-	rating: number
-	text: string
-	timestamp: number
-}
-
-interface ContactSubmission {
-	id: string
-	name: string
-	email: string
-	phone: string
-	company: string
-	subject: string
-	message: string
-	timestamp: number
-	status?: string
-	feedbackAllowed?: boolean
-}
 
 interface PricingTable {
 	id: string
@@ -39,7 +22,9 @@ interface PricingTable {
 }
 
 function RouteComponent() {
-	const [feedbacks, setFeedbacks] = useState<Feedback[]>([])
+	const { comments, feedbacks } = Route.useLoaderData()
+	const router = useRouter()
+
 	const [isAuthenticated, setIsAuthenticated] = useState(false)
 	const [password, setPassword] = useState("")
 	const [deleteMessage, setDeleteMessage] = useState("")
@@ -47,7 +32,10 @@ function RouteComponent() {
 	const [pricingTables, setPricingTables] = useState<PricingTable[]>([])
 	const [showTableForm, setShowTableForm] = useState(false)
 	const [editingTable, setEditingTable] = useState<PricingTable | null>(null)
-	const [tableFormData, setTableFormData] = useState({ title: "", services: [{ name: "", price: "" }] })
+	const [tableFormData, setTableFormData] = useState({
+		title: "",
+		services: [{ name: "", price: "" }],
+	})
 	const [feedbackLinks, setFeedbackLinks] = useState<{ id: string; token: string; createdAt: number; used: boolean }[]>([])
 	const [copiedToken, setCopiedToken] = useState<string | null>(null)
 
@@ -62,11 +50,6 @@ function RouteComponent() {
 	}, [])
 
 	const loadData = () => {
-		const stored = localStorage.getItem("feedbacks")
-		if (stored) {
-			setFeedbacks(JSON.parse(stored))
-		}
-
 		const storedTables = localStorage.getItem("pricingTables")
 		if (storedTables) {
 			setPricingTables(JSON.parse(storedTables))
@@ -95,18 +78,14 @@ function RouteComponent() {
 		localStorage.removeItem("adminAuth")
 		setIsAuthenticated(false)
 		setPassword("")
-		setFeedbacks([])
 		setPricingTables([])
 		setFeedbackLinks([])
 	}
 
-	const handleDeleteFeedback = (id: string) => {
+	const handleDeleteFeedback = async (id: number) => {
 		if (confirm("Ви впевнені, що хочете видалити цей відгук?")) {
-			const updated = feedbacks.filter((f) => f.id !== id)
-			setFeedbacks(updated)
-			localStorage.setItem("feedbacks", JSON.stringify(updated))
-			setDeleteMessage("Відгук видалений успішно!")
-			setTimeout(() => setDeleteMessage(""), 3000)
+			await deleteCommentFunc({ data: { id } })
+			router.invalidate()
 		}
 	}
 
@@ -167,7 +146,13 @@ function RouteComponent() {
 
 		if (editingTable) {
 			const updatedTables = pricingTables.map((t) =>
-				t.id === editingTable.id ? { ...editingTable, title: tableFormData.title, services: tableFormData.services } : t
+				t.id === editingTable.id
+					? {
+							...editingTable,
+							title: tableFormData.title,
+							services: tableFormData.services,
+						}
+					: t
 			)
 			setPricingTables(updatedTables)
 			localStorage.setItem("pricingTables", JSON.stringify(updatedTables))
@@ -210,17 +195,6 @@ function RouteComponent() {
 		setShowTableForm(false)
 		setEditingTable(null)
 		setTableFormData({ title: "", services: [{ name: "", price: "" }] })
-	}
-
-	const formatDate = (timestamp: number) => {
-		const date = new Date(timestamp)
-		return date.toLocaleDateString("uk-UA", {
-			year: "numeric",
-			month: "long",
-			day: "numeric",
-			hour: "2-digit",
-			minute: "2-digit",
-		})
 	}
 
 	return (
@@ -326,7 +300,7 @@ function RouteComponent() {
 										: "text-foreground/60 hover:text-foreground"
 								}`}
 							>
-								Відгуки ({feedbacks.length})
+								Відгуки ({comments.length})
 							</button>
 							<button
 								onClick={() => setActiveTab("pricing")}
@@ -341,7 +315,7 @@ function RouteComponent() {
 						{activeTab === "feedbacks" && (
 							<div className="bg-card border border-border rounded-lg overflow-hidden">
 								<div className="p-6 bg-primary/5 border-b border-border">
-									<h2 className="text-xl font-semibold text-foreground">Всього відгуків: {feedbacks.length}</h2>
+									<h2 className="text-xl font-semibold text-foreground">Всього відгуків: {comments.length}</h2>
 								</div>
 
 								<div className="overflow-x-auto">
@@ -357,21 +331,21 @@ function RouteComponent() {
 											</tr>
 										</thead>
 										<tbody className="divide-y divide-border">
-											{feedbacks.length > 0 ? (
-												feedbacks.map((feedback) => (
-													<tr key={feedback.id} className="hover:bg-primary/5 transition">
-														<td className="px-6 py-4 text-sm text-foreground">{feedback.name}</td>
-														<td className="px-6 py-4 text-sm text-foreground">{feedback.company}</td>
+											{comments.length > 0 ? (
+												comments.map((comment) => (
+													<tr key={comment.id} className="hover:bg-primary/5 transition">
+														<td className="px-6 py-4 text-sm text-foreground">{comment.name}</td>
+														<td className="px-6 py-4 text-sm text-foreground">{comment.company}</td>
 														<td className="px-6 py-4 text-sm">
-															<span className="text-yellow-500">{"★".repeat(feedback.rating)}</span>
+															<span className="text-yellow-500">{"★".repeat(comment.rating)}</span>
 														</td>
-														<td className="px-6 py-4 text-sm text-foreground/70">{formatDate(feedback.timestamp)}</td>
+														<td className="px-6 py-4 text-sm text-foreground/70">{formatDate(comment.createdAt)}</td>
 														<td className="px-6 py-4 text-sm text-foreground/80 max-w-xs truncate">
-															{feedback.text.substring(0, 50)}...
+															{comment.text?.substring(0, 50)}...
 														</td>
 														<td className="px-6 py-4 text-sm text-center">
 															<button
-																onClick={() => handleDeleteFeedback(feedback.id)}
+																onClick={() => handleDeleteFeedback(comment.id)}
 																className="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-3 rounded transition"
 															>
 																Видалити
@@ -418,7 +392,12 @@ function RouteComponent() {
 												<input
 													type="text"
 													value={tableFormData.title}
-													onChange={(e) => setTableFormData({ ...tableFormData, title: e.target.value })}
+													onChange={(e) =>
+														setTableFormData({
+															...tableFormData,
+															title: e.target.value,
+														})
+													}
 													className="w-full px-4 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
 													placeholder="Наприклад: Бухгалтерські послуги"
 												/>

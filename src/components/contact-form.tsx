@@ -1,152 +1,152 @@
-import { useState } from 'react'
+import { useState } from "react"
 
 export default function ContactForm() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    company: '',
-    subject: '',
-    message: ''
-  })
+	const [formData, setFormData] = useState({
+		name: "",
+		email: "",
+		phone: "",
+		company: "",
+		subject: "",
+		message: "",
+	})
 
-  const [submitted, setSubmitted] = useState(false)
+	const [submitted, setSubmitted] = useState(false)
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
-  }
+	const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+		const { name, value } = e.target
+		setFormData((prev) => ({
+			...prev,
+			[name]: value,
+		}))
+	}
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    const contactSubmission = {
-      id: Date.now().toString(),
-      ...formData,
-      timestamp: Date.now()
-    }
-    
-    const stored = localStorage.getItem('contactSubmissions')
-    const submissions = stored ? JSON.parse(stored) : []
-    submissions.push(contactSubmission)
-    localStorage.setItem('contactSubmissions', JSON.stringify(submissions))
-    
-    setSubmitted(true)
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      company: '',
-      subject: '',
-      message: ''
-    })
-    setTimeout(() => setSubmitted(false), 5000)
-  }
+	const handleSubmit = (e: React.FormEvent) => {
+		e.preventDefault()
 
-  return (
-    <div className="bg-card border border-border rounded-lg p-12">
-      <h2 className="text-3xl font-bold text-primary mb-8">Форма зв'язку</h2>
-      
-      {submitted && (
-        <div className="mb-8 p-4 bg-green-100 border border-green-300 rounded-lg text-green-800">
-          ✓ Дякуємо! Ваше повідомлення успішно надіслано. Ми зв'яжемося з вами найближчим часом.
-        </div>
-      )}
+		const contactSubmission = {
+			id: Date.now().toString(),
+			...formData,
+			timestamp: Date.now(),
+		}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-foreground font-semibold mb-2">Ваше ім'я *</label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
-              placeholder="Іван Петренко"
-            />
-          </div>
-          <div>
-            <label className="block text-foreground font-semibold mb-2">Електронна пошта *</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
-              placeholder="ivan@company.ua"
-            />
-          </div>
-        </div>
+		const stored = localStorage.getItem("contactSubmissions")
+		const submissions = stored ? JSON.parse(stored) : []
+		submissions.push(contactSubmission)
+		localStorage.setItem("contactSubmissions", JSON.stringify(submissions))
 
-        <div className="grid md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-foreground font-semibold mb-2">Телефон</label>
-            <input
-              type="tel"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
-              placeholder="+38 (099) 123-45-67"
-            />
-          </div>
-          <div>
-            <label className="block text-foreground font-semibold mb-2">Назва компанії</label>
-            <input
-              type="text"
-              name="company"
-              value={formData.company}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
-              placeholder="ТОВ 'Приклад'"
-            />
-          </div>
-        </div>
+		setSubmitted(true)
+		setFormData({
+			name: "",
+			email: "",
+			phone: "",
+			company: "",
+			subject: "",
+			message: "",
+		})
+		setTimeout(() => setSubmitted(false), 5000)
+	}
 
-        <div>
-          <label className="block text-foreground font-semibold mb-2">Тема запиту *</label>
-          <select
-            name="subject"
-            value={formData.subject}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
-          >
-            <option value="">Виберіть тему</option>
-            <option value="бухгалтерія">Ведення бухгалтерії</option>
-            <option value="податки">Податкове консультування</option>
-            <option value="аналіз">Фінансовий аналіз</option>
-            <option value="реєстрація">Реєстрація компанії</option>
-            <option value="інше">Інше</option>
-          </select>
-        </div>
+	return (
+		<div className="bg-card border border-border rounded-lg p-12">
+			<h2 className="text-3xl font-bold text-primary mb-8">Форма зв'язку</h2>
 
-        <div>
-          <label className="block text-foreground font-semibold mb-2">Ваше повідомлення *</label>
-          <textarea
-            name="message"
-            value={formData.message}
-            onChange={handleChange}
-            required
-            rows={6}
-            className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-accent resize-none"
-            placeholder="Розкажіть нам про ваші потреби..."
-          />
-        </div>
+			{submitted && (
+				<div className="mb-8 p-4 bg-green-100 border border-green-300 rounded-lg text-green-800">
+					✓ Дякуємо! Ваше повідомлення успішно надіслано. Ми зв'яжемося з вами найближчим часом.
+				</div>
+			)}
 
-        <button
-          type="submit"
-          className="w-full bg-accent text-accent-foreground px-8 py-4 rounded-lg font-semibold hover:bg-accent/90 transition text-lg"
-        >
-          Надіслати запит
-        </button>
-      </form>
-    </div>
-  )
+			<form onSubmit={handleSubmit} className="space-y-6">
+				<div className="grid md:grid-cols-2 gap-6">
+					<div>
+						<p className="block text-foreground font-semibold mb-2">Ваше ім'я *</p>
+						<input
+							type="text"
+							name="name"
+							value={formData.name}
+							onChange={handleChange}
+							required
+							className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+							placeholder="Іван Петренко"
+						/>
+					</div>
+					<div>
+						<p className="block text-foreground font-semibold mb-2">Електронна пошта *</p>
+						<input
+							type="email"
+							name="email"
+							value={formData.email}
+							onChange={handleChange}
+							required
+							className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+							placeholder="ivan@company.ua"
+						/>
+					</div>
+				</div>
+
+				<div className="grid md:grid-cols-2 gap-6">
+					<div>
+						<p className="block text-foreground font-semibold mb-2">Телефон</p>
+						<input
+							type="tel"
+							name="phone"
+							value={formData.phone}
+							onChange={handleChange}
+							className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+							placeholder="+38 (099) 123-45-67"
+						/>
+					</div>
+					<div>
+						<p className="block text-foreground font-semibold mb-2">Назва компанії</p>
+						<input
+							type="text"
+							name="company"
+							value={formData.company}
+							onChange={handleChange}
+							className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+							placeholder="ТОВ 'Приклад'"
+						/>
+					</div>
+				</div>
+
+				<div>
+					<p className="block text-foreground font-semibold mb-2">Тема запиту *</p>
+					<select
+						name="subject"
+						value={formData.subject}
+						onChange={handleChange}
+						required
+						className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+					>
+						<option value="">Виберіть тему</option>
+						<option value="бухгалтерія">Ведення бухгалтерії</option>
+						<option value="податки">Податкове консультування</option>
+						<option value="аналіз">Фінансовий аналіз</option>
+						<option value="реєстрація">Реєстрація компанії</option>
+						<option value="інше">Інше</option>
+					</select>
+				</div>
+
+				<div>
+					<p className="block text-foreground font-semibold mb-2">Ваше повідомлення *</p>
+					<textarea
+						name="message"
+						value={formData.message}
+						onChange={handleChange}
+						required
+						rows={6}
+						className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-accent resize-none"
+						placeholder="Розкажіть нам про ваші потреби..."
+					/>
+				</div>
+
+				<button
+					type="submit"
+					className="w-full bg-accent text-accent-foreground px-8 py-4 rounded-lg font-semibold hover:bg-accent/90 transition text-lg"
+				>
+					Надіслати запит
+				</button>
+			</form>
+		</div>
+	)
 }
