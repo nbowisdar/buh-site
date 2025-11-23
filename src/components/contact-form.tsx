@@ -1,3 +1,4 @@
+import { handleFormSubmit } from "@/lib/funcs/tg"
 import { useState } from "react"
 
 export default function ContactForm() {
@@ -20,19 +21,10 @@ export default function ContactForm() {
 		}))
 	}
 
-	const handleSubmit = (e: React.FormEvent) => {
+	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
 
-		const contactSubmission = {
-			id: Date.now().toString(),
-			...formData,
-			timestamp: Date.now(),
-		}
-
-		const stored = localStorage.getItem("contactSubmissions")
-		const submissions = stored ? JSON.parse(stored) : []
-		submissions.push(contactSubmission)
-		localStorage.setItem("contactSubmissions", JSON.stringify(submissions))
+		localStorage.setItem("contactSubmission", "true")
 
 		setSubmitted(true)
 		setFormData({
@@ -43,6 +35,7 @@ export default function ContactForm() {
 			subject: "",
 			message: "",
 		})
+		await handleFormSubmit({ data: formData })
 		setTimeout(() => setSubmitted(false), 5000)
 	}
 
