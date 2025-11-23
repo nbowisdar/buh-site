@@ -64,7 +64,6 @@ export const updatePriceFullFunc = createServerFn({ method: "POST" })
 				tasks.push(db.update(priceRow).set(row).where(eq(priceRow.id, row.id)))
 			}
 		}
-		console.log(data)
 		await Promise.all(tasks)
 		return { success: true }
 	})

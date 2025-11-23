@@ -1,42 +1,16 @@
+import { getAllPriceFullFunc } from "@/lib/funcs/price"
 import { createFileRoute } from "@tanstack/react-router"
 
 export const Route = createFileRoute("/pricing")({
 	component: RouteComponent,
+	loader: async () => {
+		const pricingTables = await getAllPriceFullFunc()
+		return { pricingTables }
+	},
 })
 
 function RouteComponent() {
-	const pricingTables = [
-		{
-			title: "Бухгалтерські послуги",
-			services: [
-				{ name: "Ведення бухгалтерського обліку", price: "₴5,000/міс" },
-				{ name: "Підготовка фінансової звітності", price: "₴3,000" },
-				{ name: "Консультації з бухобліку", price: "₴800/год" },
-				{ name: "Облік заробітної плати", price: "₴2,500/міс" },
-				{ name: "Складання податкових декларацій", price: "₴1,500" },
-			],
-		},
-		{
-			title: "Аудиторські послуги",
-			services: [
-				{ name: "Аудит фінансової звітності", price: "від ₴15,000" },
-				{ name: "Податковий аудит", price: "від ₴10,000" },
-				{ name: "Аудит внутрішніх процесів", price: "від ₴12,000" },
-				{ name: "Експрес-аудит", price: "₴8,000" },
-			],
-		},
-		{
-			title: "Консультаційні послуги",
-			services: [
-				{ name: "Податкове планування", price: "₴5,000" },
-				{ name: "Оптимізація бізнес-процесів", price: "₴7,000" },
-				{ name: "Юридичний супровід", price: "₴1,200/год" },
-				{ name: "Консультації з МСФЗ", price: "₴1,500/год" },
-				{ name: "Розробка фінансової стратегії", price: "від ₴20,000" },
-			],
-		},
-	]
-
+	const { pricingTables } = Route.useLoaderData()
 	return (
 		<section className="py-16 bg-linear-to-b from-background to-secondary/5">
 			<div className="max-w-6xl mx-auto px-4">
@@ -61,7 +35,7 @@ function RouteComponent() {
 										</tr>
 									</thead>
 									<tbody>
-										{table.services.map((service, serviceIndex) => (
+										{table.rows.map((service, serviceIndex) => (
 											<tr key={serviceIndex} className="border-b border-foreground/5 hover:bg-primary/5 transition-colors">
 												<td className="px-8 py-4 text-foreground">{service.name}</td>
 												<td className="px-8 py-4 text-right font-semibold text-primary">{service.price}</td>
