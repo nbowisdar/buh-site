@@ -39,23 +39,21 @@ export function FeedbackLinks() {
 					Згенерувати посилання
 				</button>
 			</div>
-			<p className="text-foreground/60 text-sm mb-4">
-				Створіть унікальне посилання для клієнта, щоб він міг залишити відгук
-			</p>
+			<p className="text-foreground/60 text-sm mb-4">Створіть унікальне посилання для клієнта, щоб він міг залишити відгук</p>
 
 			{feedbackLinks.length > 0 && (
 				<div className="space-y-2">
 					{feedbackLinks.map((link) => (
-						<div
-							key={link.id}
-							className="flex items-center justify-between bg-background border border-border rounded p-3"
-						>
+						<div key={link.id} className="flex items-center justify-between bg-background border border-border rounded p-3">
 							<div className="flex-1">
 								<p className="text-sm text-foreground font-mono break-all">
 									{`${typeof window !== "undefined" ? window.location.origin : ""}/feedback/${link.token}`}
 								</p>
 								<p className="text-xs text-foreground/60 mt-1">
-									Створено: {formatDate(link.createdAt)} • {link.is_used ? "Використано" : "Не використано"}
+									Створено: {formatDate(link.createdAt)} •{" "}
+									<span className={link.is_used ? "text-green-500" : "text-yellow-500"}>
+										{link.is_used ? "Використано" : "Не використано"}
+									</span>
 								</p>
 							</div>
 							<div className="flex gap-2 ml-4">

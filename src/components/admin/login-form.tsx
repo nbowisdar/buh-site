@@ -1,3 +1,4 @@
+import { loginFunc } from "@/lib/funcs/login"
 import { useState } from "react"
 
 interface LoginFormProps {
@@ -6,12 +7,12 @@ interface LoginFormProps {
 
 export function LoginForm({ onLogin }: LoginFormProps) {
 	const [password, setPassword] = useState("")
-	const ADMIN_PASSWORD = "admin123"
 
-	const handleSubmit = (e: React.FormEvent) => {
+	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
-		if (password === ADMIN_PASSWORD) {
-			localStorage.setItem("adminAuth", "true")
+		const resp = await loginFunc({ data: { password } })
+		if (resp) {
+			localStorage.setItem("adminAuthSecure", "true")
 			onLogin()
 			setPassword("")
 		} else {
@@ -42,7 +43,6 @@ export function LoginForm({ onLogin }: LoginFormProps) {
 						Вхід
 					</button>
 				</form>
-				<p className="text-xs text-foreground/60 mt-4 text-center">Пароль: admin123</p>
 			</div>
 		</div>
 	)

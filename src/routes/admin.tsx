@@ -25,14 +25,14 @@ function RouteComponent() {
 	const [activeTab, setActiveTab] = useState<"feedbacks" | "pricing">("feedbacks")
 
 	useEffect(() => {
-		const auth = localStorage.getItem("adminAuth")
+		const auth = localStorage.getItem("adminAuthSecure")
 		if (auth === "true") {
 			setIsAuthenticated(true)
 		}
 	}, [])
 
 	const handleLogout = () => {
-		localStorage.removeItem("adminAuth")
+		localStorage.removeItem("adminAuthSecure")
 		setIsAuthenticated(false)
 	}
 
