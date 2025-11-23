@@ -1,12 +1,15 @@
 import { db } from "@/db/index"
-import { type CommentInsert, comments } from "@/db/schema"
+import { type CommentInsert, comments, feedbackLinks } from "@/db/schema"
 import { createServerFn } from "@tanstack/react-start"
 import { eq } from "drizzle-orm"
 
 export const addCommentFunc = createServerFn({ method: "POST" })
-	.inputValidator((data: CommentInsert) => data)
+	.inputValidator((data: CommentInsert & { token: string }) => data)
 	.handler(async ({ data }) => {
-		await db.insert(comments).values(data)
+		const tasks = []
+		tasks.push(db.insert(comments).values(data))
+		tasks.push(db.update(feedbackLinks).set({ is_used: true }).where(eq(feedbackLinks.token, data.token)))
+		await Promise.all(tasks)
 	})
 
 export const deleteCommentFunc = createServerFn({ method: "POST" })

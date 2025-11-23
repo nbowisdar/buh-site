@@ -1,3 +1,4 @@
+import Loading from "@/components/loading"
 import { CommentInsert } from "@/db/schema"
 import { addCommentFunc } from "@/lib/funcs/comments"
 import { checkTokenFunc } from "@/lib/funcs/feedbacksLinks"
@@ -72,7 +73,6 @@ function RouteComponent() {
 	useEffect(() => {
 		if (!loading && !feedbackEnabled && !userHasPermission) {
 			console.log("Go to contact")
-			// router.push("/contact")
 		}
 	}, [loading, feedbackEnabled, userHasPermission])
 
@@ -108,20 +108,19 @@ function RouteComponent() {
 
 		setIsSubmitting(true)
 
-		const newFeedback: CommentInsert = {
+		const newFeedback = {
 			name: formData.name,
 			company: formData.company,
 			rating: formData.rating,
 			text: formData.text,
 			userId: userId,
+			token,
 		}
 
 		const updatedFeedbacks = [newFeedback, ...feedbacks]
 		setFeedbacks(updatedFeedbacks)
 		localStorage.setItem("feedbacks", JSON.stringify(updatedFeedbacks))
 		setExistingFeedback(newFeedback)
-
-		console.log("Send")
 
 		addCommentFunc({ data: newFeedback })
 
@@ -130,7 +129,7 @@ function RouteComponent() {
 		setTimeout(() => setSubmitMessage(""), 3000)
 	}
 
-	if (loading) return <div>Завантаження...</div>
+	if (loading) return <Loading />
 
 	return (
 		<div className="min-h-screen bg-background">

@@ -1,6 +1,4 @@
-import { boolean, integer, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core"
-
-import { relations } from "drizzle-orm"
+import { boolean, integer, json, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core"
 
 export const comments = pgTable("comments", {
 	id: serial("id").primaryKey(),
@@ -12,17 +10,16 @@ export const comments = pgTable("comments", {
 	userId: text("user_id").notNull(),
 })
 
+export type Services = {
+	name: string
+	price: string
+}
+
 export const price = pgTable("price", {
 	id: serial("id").primaryKey(),
 	title: text().notNull(),
 	comment: text(),
-})
-
-export const priceRow = pgTable("price_row", {
-	id: serial("id").primaryKey(),
-	name: text().notNull(),
-	price: text().notNull(),
-	priceId: integer("price_id").references(() => price.id, { onDelete: "cascade" }),
+	services: json().$type<Services[]>(),
 })
 
 export const feedbackLinks = pgTable("feedback_links", {
@@ -43,26 +40,3 @@ export type Comment = typeof comments.$inferSelect
 // Types for price
 export type PriceInsert = typeof price.$inferInsert
 export type Price = typeof price.$inferSelect
-
-// Types for priceRow
-export type PriceRowInsert = typeof priceRow.$inferInsert
-export type PriceRow = typeof priceRow.$inferSelect
-
-export type PriceFull = PriceInsert & {
-	rows: PriceRowInsert[]
-}
-
-export type PriceRowUpdate = { id: number } & Partial<PriceRowInsert>
-
-export type PriceFullUpdate = { id: number } & Partial<PriceInsert> & { rows?: PriceRowUpdate[] }
-
-export const priceRelations = relations(price, ({ many }) => ({
-	rows: many(priceRow),
-}))
-
-export const priceRowRelations = relations(priceRow, ({ one }) => ({
-	parent: one(price, {
-		fields: [priceRow.priceId],
-		references: [price.id],
-	}),
-}))

@@ -35,7 +35,7 @@ function RouteComponent() {
 										</tr>
 									</thead>
 									<tbody>
-										{table.rows.map((service, serviceIndex) => (
+										{table.services?.map((service, serviceIndex) => (
 											<tr key={serviceIndex} className="border-b border-foreground/5 hover:bg-primary/5 transition-colors">
 												<td className="px-8 py-4 text-foreground">{service.name}</td>
 												<td className="px-8 py-4 text-right font-semibold text-primary">{service.price}</td>

@@ -40,7 +40,7 @@ export default function Header() {
 						</Link>
 					</li>
 					<li>
-						<Link to="/feedback" className="hover:text-accent transition">
+						<Link to="/feedbacks" className="hover:text-accent transition">
 							Відгуки
 						</Link>
 					</li>

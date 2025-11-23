@@ -8,6 +8,8 @@ import appCss from "../styles.css?url"
 
 import Header from "@/components/header"
 import Footer from "@/components/footer"
+import Loading from "@/components/loading"
+import NotFound from "@/components/not-found"
 import type { QueryClient } from "@tanstack/react-query"
 
 interface MyRouterContext {
@@ -50,6 +52,8 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 	}),
 
 	shellComponent: RootDocument,
+	notFoundComponent: NotFound,
+	pendingComponent: Loading,
 })
 
 function RootDocument({ children }: { children: React.ReactNode }) {

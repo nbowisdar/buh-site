@@ -1,5 +1,5 @@
 import { db } from "@/db/index"
-import { PriceFull, PriceFullUpdate, PriceInsert, PriceRowInsert, price, priceRow } from "@/db/schema"
+import { PriceInsert, price } from "@/db/schema"
 import { createServerFn } from "@tanstack/react-start"
 import { eq } from "drizzle-orm"
 
@@ -23,56 +23,21 @@ export const getAllPriceFunc = createServerFn({ method: "GET" }).handler(async (
 	return response
 })
 
-export const addPriceRowFunc = createServerFn({ method: "POST" })
-	.inputValidator((data: PriceRowInsert) => data)
-	.handler(async ({ data }) => {
-		console.log("Server fn called with:", data)
-		await db.insert(priceRow).values(data)
-	})
-
-export const deletePriceRowFunc = createServerFn({ method: "POST" })
-	.inputValidator((data: { id: number }) => data)
-	.handler(async ({ data }) => {
-		console.log("Server fn called with:", data)
-		await db.delete(priceRow).where(eq(priceRow.id, data.id))
-	})
-
-export const getAllPriceRowFunc = createServerFn({ method: "GET" }).handler(async () => {
-	console.log("Loading price rows from server")
-	return await db.select().from(priceRow)
-})
+// Alias for compatibility with existing code, but functionally the same as getAllPriceFunc
+export const getAllPriceFullFunc = getAllPriceFunc
 
 export const addPriceFullFunc = createServerFn({ method: "POST" })
-	.inputValidator((data: PriceFull) => data)
+	.inputValidator((data: PriceInsert) => data)
 	.handler(async ({ data }) => {
 		console.log("Server fn called with:", data)
-		const res = await db.insert(price).values({ title: data.title }).returning()
-		const priceId = res[0].id
-		const rows = data.rows.map((row) => ({ ...row, priceId }))
-		await db.insert(priceRow).values(rows)
+		await db.insert(price).values(data)
 	})
 
 export const updatePriceFullFunc = createServerFn({ method: "POST" })
-	.inputValidator((data: PriceFullUpdate) => data)
+	.inputValidator((data: { id: number } & Partial<PriceInsert>) => data)
 	.handler(async ({ data }) => {
-		const tasks = []
-		if (data.title) {
-			tasks.push(db.update(price).set({ title: data.title }).where(eq(price.id, data.id)))
-		}
-		if (data.rows) {
-			for (const row of data.rows) {
-				tasks.push(db.update(priceRow).set(row).where(eq(priceRow.id, row.id)))
-			}
-		}
-		await Promise.all(tasks)
+		console.log("Server fn called with:", data)
+		const { id, ...updateData } = data
+		await db.update(price).set(updateData).where(eq(price.id, id))
 		return { success: true }
 	})
-
-export const getAllPriceFullFunc = createServerFn({ method: "GET" }).handler(async () => {
-	// const rows = await db.select().from(price).leftJoin(priceRow, eq(price.id, priceRow.priceId))
-	return await db.query.price.findMany({
-		with: {
-			rows: true,
-		},
-	})
-})
