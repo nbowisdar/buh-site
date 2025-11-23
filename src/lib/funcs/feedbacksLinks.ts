@@ -50,3 +50,7 @@ export const setTokenIsUsedFunc = createServerFn({ method: "GET" })
 	.handler(async ({ data: token }) => {
 		await db.update(feedbackLinks).set({ is_used: true }).where(eq(feedbackLinks.token, token))
 	})
+
+export const deleteUsedFeedbackLinksFunc = createServerFn({ method: "POST" }).handler(async () => {
+	await db.delete(feedbackLinks).where(eq(feedbackLinks.is_used, true))
+})

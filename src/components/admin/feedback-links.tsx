@@ -1,17 +1,24 @@
-import { deleteFeedbackFunc, generateFeedbackFunc } from "@/lib/funcs/feedbacksLinks"
+import { deleteFeedbackFunc, deleteUsedFeedbackLinksFunc, generateFeedbackFunc } from "@/lib/funcs/feedbacksLinks"
 import { formatDate } from "@/lib/misk"
-import { Check, Copy } from "lucide-react"
+import { Check, Copy, Trash2 } from "lucide-react"
 import { useState } from "react"
-import { useLoaderData, useRouter } from '@tanstack/react-router'
+import { useLoaderData, useRouter } from "@tanstack/react-router"
 
 export function FeedbackLinks() {
-	const {feedbackLinks} = useLoaderData({from: "/admin"})
+	const { feedbackLinks } = useLoaderData({ from: "/admin" })
 	const router = useRouter()
 	const [copiedToken, setCopiedToken] = useState<string | null>(null)
 
 	const handleGenerateFeedbackLink = async () => {
 		await generateFeedbackFunc()
 		router.invalidate()
+	}
+
+	const handleDeleteUsedLinks = async () => {
+		if (confirm("Ви впевнені, що хочете видалити всі використані посилання?")) {
+			await deleteUsedFeedbackLinksFunc()
+			router.invalidate()
+		}
 	}
 
 	const handleDeleteLink = async (id: number) => {
@@ -32,12 +39,21 @@ export function FeedbackLinks() {
 		<div className="bg-card border border-border rounded-lg p-6 mb-8">
 			<div className="flex justify-between items-center mb-4">
 				<h2 className="text-lg font-semibold text-foreground">Керування відгуками</h2>
-				<button
-					onClick={handleGenerateFeedbackLink}
-					className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-2 px-4 rounded-md transition"
-				>
-					Згенерувати посилання
-				</button>
+				<div className="flex gap-2">
+					<button
+						onClick={handleDeleteUsedLinks}
+						className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-md transition flex items-center gap-2"
+					>
+						<Trash2 className="w-4 h-4" />
+						Видалити використані
+					</button>
+					<button
+						onClick={handleGenerateFeedbackLink}
+						className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-2 px-4 rounded-md transition"
+					>
+						Згенерувати посилання
+					</button>
+				</div>
 			</div>
 			<p className="text-foreground/60 text-sm mb-4">Створіть унікальне посилання для клієнта, щоб він міг залишити відгук</p>
 
