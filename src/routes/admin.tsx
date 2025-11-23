@@ -2,6 +2,7 @@ import { FeedbackLinks } from "@/components/admin/feedback-links"
 import { FeedbackList } from "@/components/admin/feedback-list"
 import { LoginForm } from "@/components/admin/login-form"
 import { PricingManager } from "@/components/admin/pricing-manager"
+import Loading from "@/components/loading"
 import { getAllCommentFunc } from "@/lib/funcs/comments"
 import { getAllFeedbackFunc } from "@/lib/funcs/feedbacksLinks"
 import { getAllPriceFullFunc } from "@/lib/funcs/price"
@@ -21,13 +22,15 @@ export const Route = createFileRoute("/admin")({
 function RouteComponent() {
 	const { comments, pricingTables } = Route.useLoaderData()
 
-	const [isAuthenticated, setIsAuthenticated] = useState(false)
+	const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
 	const [activeTab, setActiveTab] = useState<"feedbacks" | "pricing">("feedbacks")
 
 	useEffect(() => {
 		const auth = localStorage.getItem("adminAuthSecure")
 		if (auth === "true") {
 			setIsAuthenticated(true)
+		} else {
+			setIsAuthenticated(false)
 		}
 	}, [])
 
@@ -35,7 +38,9 @@ function RouteComponent() {
 		localStorage.removeItem("adminAuthSecure")
 		setIsAuthenticated(false)
 	}
-
+	if (isAuthenticated === null) {
+		return <Loading />
+	}
 	return (
 		<div className="min-h-screen bg-background">
 			<div className="max-w-7xl mx-auto px-4 py-20">

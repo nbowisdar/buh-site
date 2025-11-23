@@ -13,7 +13,7 @@ export type FormDataType = {
 	message: string
 }
 
-async function sendMessageTelegram(text: string) {
+export async function sendMessageTelegram(text: string) {
 	const url = `https://api.telegram.org/bot${botToken}/sendMessage`
 	console.log(`Sending message: ${text}`)
 	const response = await axios.post(url, {

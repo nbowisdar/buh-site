@@ -2,6 +2,7 @@ import { db } from "@/db/index"
 import { type CommentInsert, comments, feedbackLinks } from "@/db/schema"
 import { createServerFn } from "@tanstack/react-start"
 import { eq } from "drizzle-orm"
+import { sendMessageTelegram } from "./tg"
 
 export const addCommentFunc = createServerFn({ method: "POST" })
 	.inputValidator((data: CommentInsert & { token: string }) => data)
@@ -9,6 +10,13 @@ export const addCommentFunc = createServerFn({ method: "POST" })
 		const tasks = []
 		tasks.push(db.insert(comments).values(data))
 		tasks.push(db.update(feedbackLinks).set({ is_used: true }).where(eq(feedbackLinks.token, data.token)))
+		const msg = `
+			Новий відгук:
+			Компанія: ${data.company}
+			Рейтинг: ${data.rating}
+			Текст: ${data.text}
+		`
+		tasks.push(sendMessageTelegram(msg))
 		await Promise.all(tasks)
 	})
 
