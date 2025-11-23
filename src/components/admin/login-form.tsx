@@ -13,6 +13,7 @@ export function LoginForm({ onLogin }: LoginFormProps) {
 		const resp = await loginFunc({ data: { password } })
 		if (resp) {
 			localStorage.setItem("adminAuthSecure", "true")
+			window.dispatchEvent(new Event("admin-auth-change"))
 			onLogin()
 			setPassword("")
 		} else {

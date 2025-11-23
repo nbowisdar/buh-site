@@ -1,10 +1,24 @@
 import { Link } from "@tanstack/react-router"
 import { Image } from "@unpic/react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import ThemeSwitcher from "./mode-toggle"
 
 export default function Header() {
 	const [isOpen, setIsOpen] = useState(false)
+	const [isAdmin, setIsAdmin] = useState(false)
+
+	useEffect(() => {
+		const checkAuth = () => {
+			const auth = localStorage.getItem("adminAuthSecure")
+			console.log(auth)
+			setIsAdmin(auth === "true")
+		}
+
+		checkAuth()
+
+		window.addEventListener("admin-auth-change", checkAuth)
+		return () => window.removeEventListener("admin-auth-change", checkAuth)
+	}, [])
 
 	return (
 		<nav className="bg-primary text-primary-foreground sticky top-0 z-50 shadow-sm">
@@ -44,6 +58,13 @@ export default function Header() {
 							Відгуки
 						</Link>
 					</li>
+					{isAdmin && (
+						<li>
+							<Link to="/admin" className="hover:text-accent transition">
+								Адмін
+							</Link>
+						</li>
+					)}
 					<li>
 						<Link to="/contact" className="bg-secondary hover:bg-secondary/90 px-4 py-2 rounded-md transition">
 							Контакти

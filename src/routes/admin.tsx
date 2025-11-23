@@ -37,6 +37,7 @@ function RouteComponent() {
 	const handleLogout = () => {
 		localStorage.removeItem("adminAuthSecure")
 		setIsAuthenticated(false)
+		window.dispatchEvent(new Event("admin-auth-change"))
 	}
 	if (isAuthenticated === null) {
 		return <Loading />

@@ -76,21 +76,6 @@ function RouteComponent() {
 		}
 	}, [loading, feedbackEnabled, userHasPermission])
 
-	const handleDelete = () => {
-		if (!existingFeedback) return
-
-		if (confirm("Ви впевнені, що хочете видалити свій відгук?")) {
-			const updatedFeedbacks = feedbacks.filter((f) => f.id !== existingFeedback.id)
-			setFeedbacks(updatedFeedbacks)
-			localStorage.setItem("feedbacks", JSON.stringify(updatedFeedbacks))
-
-			setExistingFeedback(null)
-			setFormData({ name: "", company: "", rating: 5, text: "" })
-			setSubmitMessage("Ваш відгук видалено успішно.")
-			setTimeout(() => setSubmitMessage(""), 3000)
-		}
-	}
-
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault()
 
@@ -131,6 +116,35 @@ function RouteComponent() {
 
 	if (loading) return <Loading />
 
+	if (existingFeedback) {
+		return (
+			<div className="min-h-screen bg-background">
+				<div className="max-w-2xl mx-auto px-4 py-20">
+					<div className="bg-card border border-border rounded-lg p-12 text-center">
+						<h2 className="text-3xl font-bold text-primary mb-4">Відгук вже надіслано</h2>
+						<p className="text-foreground text-lg mb-8">Ви вже залишили відгук за цим посиланням. Дякуємо за вашу думку!</p>
+						<div className="p-6 bg-muted rounded-lg text-left mb-8">
+							<div className="flex justify-between items-start mb-4">
+								<div>
+									<h3 className="font-bold text-lg">{existingFeedback.name}</h3>
+									<p className="text-sm text-foreground/70">{existingFeedback.company}</p>
+								</div>
+								<div className="text-yellow-500">{"★".repeat(existingFeedback.rating || 5)}</div>
+							</div>
+							<p className="text-foreground/80">{existingFeedback.text}</p>
+						</div>
+						<a
+							href="/"
+							className="inline-block bg-primary text-primary-foreground px-8 py-3 rounded-lg font-semibold hover:bg-primary/90 transition"
+						>
+							Повернутися на головну
+						</a>
+					</div>
+				</div>
+			</div>
+		)
+	}
+
 	return (
 		<div className="min-h-screen bg-background">
 			<div className="max-w-2xl mx-auto px-4 py-20">
@@ -144,12 +158,6 @@ function RouteComponent() {
 								зв'яжіться з нами
 							</a>{" "}
 							через форму контакту.
-						</div>
-					)}
-
-					{existingFeedback && (
-						<div className="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-md mb-6">
-							Ви вже залишили відгук. Ви можете видалити його та створити новий.
 						</div>
 					)}
 
@@ -217,16 +225,6 @@ function RouteComponent() {
 							>
 								{isSubmitting ? "Надсилання..." : "Надіслати відгук"}
 							</button>
-
-							{existingFeedback && (
-								<button
-									type="button"
-									onClick={handleDelete}
-									className="px-6 bg-red-500 hover:bg-red-600 text-white font-semibold py-3 rounded-md transition"
-								>
-									Видалити
-								</button>
-							)}
 						</div>
 
 						{submitMessage && (
