@@ -1,7 +1,7 @@
 import { db } from "@/db/index"
 import { type FeedbackLinkInsert, feedbackLinks } from "@/db/schema"
 import { createServerFn } from "@tanstack/react-start"
-import { eq } from "drizzle-orm"
+import { eq, and } from "drizzle-orm"
 
 export const addFeedbackFunc = createServerFn({ method: "POST" })
 	.inputValidator((data: FeedbackLinkInsert) => data)
@@ -34,3 +34,20 @@ export const generateFeedbackFunc = createServerFn({ method: "POST" }).handler(a
 	const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
 	await db.insert(feedbackLinks).values({ token })
 })
+
+export const checkTokenFunc = createServerFn({ method: "GET" })
+	.inputValidator((token: string) => token)
+	.handler(async ({ data: token }) => {
+		console.log(token, "token")
+
+		const resp = await db
+			.select()
+			.from(feedbackLinks)
+			.where(and(eq(feedbackLinks.token, token), eq(feedbackLinks.is_used, false)))
+		console.log(resp)
+
+		if (resp.length > 0) {
+			return true
+		}
+		return false
+	})

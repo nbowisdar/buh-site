@@ -3,7 +3,7 @@ import { formatDate } from "@/lib/misk"
 import { createFileRoute } from "@tanstack/react-router"
 import { useState } from "react"
 
-export const Route = createFileRoute("/feedback")({
+export const Route = createFileRoute("/feedbacks")({
 	component: RouteComponent,
 	loader: async () => {
 		const feedbacks = await getAllCommentFunc()
@@ -15,7 +15,6 @@ const ITEMS_PER_PAGE = 6
 
 function RouteComponent() {
 	const { feedbacks } = Route.useLoaderData()
-	console.log(feedbacks, "feedbacks")
 	const [currentPage, setCurrentPage] = useState(1)
 
 	const totalPages = Math.ceil(feedbacks.length / ITEMS_PER_PAGE)

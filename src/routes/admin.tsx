@@ -80,7 +80,7 @@ function RouteComponent() {
 	}
 
 	const handleCopyLink = (token: string) => {
-		const link = `${window.location.origin}/leave-feedback?token=${token}`
+		const link = `${window.location.origin}/feedback/${token}`
 		navigator.clipboard.writeText(link)
 		setCopiedToken(token)
 		setTimeout(() => setCopiedToken(null), 2000)
@@ -219,7 +219,7 @@ function RouteComponent() {
 										>
 											<div className="flex-1">
 												<p className="text-sm text-foreground font-mono break-all">
-													{`${typeof window !== "undefined" ? window.location.origin : ""}/leave-feedback?token=${link.token}`}
+													{`${typeof window !== "undefined" ? window.location.origin : ""}/feedback/${link.token}`}
 												</p>
 												<p className="text-xs text-foreground/60 mt-1">
 													Створено: {formatDate(link.createdAt)} • {link.is_used ? "Використано" : "Не використано"}

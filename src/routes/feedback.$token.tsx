@@ -1,13 +1,23 @@
 import { CommentInsert } from "@/db/schema"
 import { addCommentFunc } from "@/lib/funcs/comments"
-import { createFileRoute } from "@tanstack/react-router"
+import { checkTokenFunc } from "@/lib/funcs/feedbacksLinks"
+import { createFileRoute, redirect } from "@tanstack/react-router"
 import { useEffect, useState } from "react"
 
-export const Route = createFileRoute("/leave_feedback")({
+export const Route = createFileRoute("/feedback/$token")({
 	component: RouteComponent,
+	loader: async ({ params: { token } }) => {
+		const token_valid = await checkTokenFunc({ data: token })
+		if (!token_valid) {
+			throw redirect({ to: "/" })
+		}
+		return { token }
+	},
 })
 
 function RouteComponent() {
+	const { token } = Route.useLoaderData()
+
 	const [feedbackEnabled, setFeedbackEnabled] = useState(true)
 	const [feedbacks, setFeedbacks] = useState<CommentInsert[]>([])
 	const [formData, setFormData] = useState({ name: "", company: "", rating: 5, text: "" })
@@ -166,7 +176,7 @@ function RouteComponent() {
 									value={formData.company}
 									onChange={(e) => setFormData({ ...formData, company: e.target.value })}
 									className="w-full px-4 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-									placeholder="ТОВ 'Приклад'"
+									placeholder="ТОВ Приклад"
 									disabled={!feedbackEnabled && !userHasPermission}
 								/>
 							</div>

@@ -10,26 +10,21 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PricingRouteImport } from './routes/pricing'
-import { Route as Leave_feedbackRouteImport } from './routes/leave_feedback'
-import { Route as FeedbackRouteImport } from './routes/feedback'
+import { Route as FeedbacksRouteImport } from './routes/feedbacks'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as FeedbackTokenRouteImport } from './routes/feedback.$token'
 
 const PricingRoute = PricingRouteImport.update({
   id: '/pricing',
   path: '/pricing',
   getParentRoute: () => rootRouteImport,
 } as any)
-const Leave_feedbackRoute = Leave_feedbackRouteImport.update({
-  id: '/leave_feedback',
-  path: '/leave_feedback',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FeedbackRoute = FeedbackRouteImport.update({
-  id: '/feedback',
-  path: '/feedback',
+const FeedbacksRoute = FeedbacksRouteImport.update({
+  id: '/feedbacks',
+  path: '/feedbacks',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -52,24 +47,29 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FeedbackTokenRoute = FeedbackTokenRouteImport.update({
+  id: '/feedback/$token',
+  path: '/feedback/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
   '/contact': typeof ContactRoute
-  '/feedback': typeof FeedbackRoute
-  '/leave_feedback': typeof Leave_feedbackRoute
+  '/feedbacks': typeof FeedbacksRoute
   '/pricing': typeof PricingRoute
+  '/feedback/$token': typeof FeedbackTokenRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
   '/contact': typeof ContactRoute
-  '/feedback': typeof FeedbackRoute
-  '/leave_feedback': typeof Leave_feedbackRoute
+  '/feedbacks': typeof FeedbacksRoute
   '/pricing': typeof PricingRoute
+  '/feedback/$token': typeof FeedbackTokenRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -77,9 +77,9 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
   '/contact': typeof ContactRoute
-  '/feedback': typeof FeedbackRoute
-  '/leave_feedback': typeof Leave_feedbackRoute
+  '/feedbacks': typeof FeedbacksRoute
   '/pricing': typeof PricingRoute
+  '/feedback/$token': typeof FeedbackTokenRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -88,27 +88,27 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/contact'
-    | '/feedback'
-    | '/leave_feedback'
+    | '/feedbacks'
     | '/pricing'
+    | '/feedback/$token'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/admin'
     | '/contact'
-    | '/feedback'
-    | '/leave_feedback'
+    | '/feedbacks'
     | '/pricing'
+    | '/feedback/$token'
   id:
     | '__root__'
     | '/'
     | '/about'
     | '/admin'
     | '/contact'
-    | '/feedback'
-    | '/leave_feedback'
+    | '/feedbacks'
     | '/pricing'
+    | '/feedback/$token'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -116,9 +116,9 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRoute
   ContactRoute: typeof ContactRoute
-  FeedbackRoute: typeof FeedbackRoute
-  Leave_feedbackRoute: typeof Leave_feedbackRoute
+  FeedbacksRoute: typeof FeedbacksRoute
   PricingRoute: typeof PricingRoute
+  FeedbackTokenRoute: typeof FeedbackTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -130,18 +130,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PricingRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/leave_feedback': {
-      id: '/leave_feedback'
-      path: '/leave_feedback'
-      fullPath: '/leave_feedback'
-      preLoaderRoute: typeof Leave_feedbackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/feedback': {
-      id: '/feedback'
-      path: '/feedback'
-      fullPath: '/feedback'
-      preLoaderRoute: typeof FeedbackRouteImport
+    '/feedbacks': {
+      id: '/feedbacks'
+      path: '/feedbacks'
+      fullPath: '/feedbacks'
+      preLoaderRoute: typeof FeedbacksRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -172,6 +165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/feedback/$token': {
+      id: '/feedback/$token'
+      path: '/feedback/$token'
+      fullPath: '/feedback/$token'
+      preLoaderRoute: typeof FeedbackTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -180,9 +180,9 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AdminRoute: AdminRoute,
   ContactRoute: ContactRoute,
-  FeedbackRoute: FeedbackRoute,
-  Leave_feedbackRoute: Leave_feedbackRoute,
+  FeedbacksRoute: FeedbacksRoute,
   PricingRoute: PricingRoute,
+  FeedbackTokenRoute: FeedbackTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
