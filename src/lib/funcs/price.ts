@@ -1,5 +1,5 @@
 import { db } from "@/db/index"
-import { PriceFull, PriceInsert, PriceRow, PriceRowInsert, price, priceRow } from "@/db/schema"
+import { PriceFull, PriceFullUpdate, PriceInsert, PriceRowInsert, price, priceRow } from "@/db/schema"
 import { createServerFn } from "@tanstack/react-start"
 import { eq } from "drizzle-orm"
 
@@ -52,6 +52,23 @@ export const addPriceFullFunc = createServerFn({ method: "POST" })
 		await db.insert(priceRow).values(rows)
 	})
 
+export const updatePriceFullFunc = createServerFn({ method: "POST" })
+	.inputValidator((data: PriceFullUpdate) => data)
+	.handler(async ({ data }) => {
+		const tasks = []
+		if (data.title) {
+			tasks.push(db.update(price).set({ title: data.title }).where(eq(price.id, data.id)))
+		}
+		if (data.rows) {
+			for (const row of data.rows) {
+				tasks.push(db.update(priceRow).set(row).where(eq(priceRow.id, row.id)))
+			}
+		}
+		console.log(data)
+		await Promise.all(tasks)
+		return { success: true }
+	})
+
 export const getAllPriceFullFunc = createServerFn({ method: "GET" }).handler(async () => {
 	// const rows = await db.select().from(price).leftJoin(priceRow, eq(price.id, priceRow.priceId))
 	return await db.query.price.findMany({
@@ -60,5 +77,3 @@ export const getAllPriceFullFunc = createServerFn({ method: "GET" }).handler(asy
 		},
 	})
 })
-
-

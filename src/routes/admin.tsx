@@ -1,6 +1,6 @@
 import { deleteCommentFunc, getAllCommentFunc } from "@/lib/funcs/comments"
 import { deleteFeedbackFunc, generateFeedbackFunc, getAllFeedbackFunc } from "@/lib/funcs/feedbacksLinks"
-import { addPriceFullFunc, deletePriceFunc, getAllPriceFullFunc } from "@/lib/funcs/price"
+import { addPriceFullFunc, deletePriceFunc, getAllPriceFullFunc, updatePriceFullFunc } from "@/lib/funcs/price"
 import { formatDate } from "@/lib/misk"
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
 
@@ -20,7 +20,7 @@ export const Route = createFileRoute("/admin")({
 interface PricingTable {
 	id: number
 	title: string
-	rows: { name: string; price: string }[]
+	rows: { name: string; price: string; id: number }[]
 }
 
 function RouteComponent() {
@@ -35,7 +35,8 @@ function RouteComponent() {
 	const [editingTable, setEditingTable] = useState<PricingTable | null>(null)
 	const [tableFormData, setTableFormData] = useState({
 		title: "",
-		rows: [{ name: "", price: "" }],
+		id: undefined,
+		rows: [{ name: "", price: "", id: undefined }],
 	})
 	const [copiedToken, setCopiedToken] = useState<string | null>(null)
 
@@ -116,22 +117,15 @@ function RouteComponent() {
 		}
 
 		if (editingTable) {
-			const updatedTables = pricingTables.map((t) =>
-				t.id === editingTable.id
-					? {
-							...editingTable,
-							title: tableFormData.title,
-							rows: tableFormData.rows,
-						}
-					: t
-			)
-			localStorage.setItem("pricingTables", JSON.stringify(updatedTables))
+			console.log(tableFormData, "updatedTables")
+
+			updatePriceFullFunc({ data: tableFormData })
 			setDeleteMessage("Таблицю оновлено успішно!")
 		} else {
 			addPriceFullFunc({ data: tableFormData })
 			setDeleteMessage("Таблицю додано успішно!")
 		}
-
+		router.invalidate()
 		setShowTableForm(false)
 		setEditingTable(null)
 		setTableFormData({ title: "", rows: [{ name: "", price: "" }] })
@@ -140,7 +134,8 @@ function RouteComponent() {
 
 	const handleEditTable = (table: PricingTable) => {
 		setEditingTable(table)
-		setTableFormData({ title: table.title, rows: [...table.rows] })
+		setTableFormData(table)
+		// setTableFormData({ title: table.title, rows: [...table.rows] })
 		setShowTableForm(true)
 	}
 

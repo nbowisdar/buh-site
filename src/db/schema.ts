@@ -52,6 +52,10 @@ export type PriceFull = PriceInsert & {
 	rows: PriceRowInsert[]
 }
 
+export type PriceRowUpdate = { id: number } & Partial<PriceRowInsert>
+
+export type PriceFullUpdate = { id: number } & Partial<PriceInsert> & { rows?: PriceRowUpdate[] }
+
 export const priceRelations = relations(price, ({ many }) => ({
 	rows: many(priceRow),
 }))
