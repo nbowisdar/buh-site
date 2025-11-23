@@ -1,5 +1,5 @@
 import { handleFormSubmit } from "@/lib/funcs/tg"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 export default function ContactForm() {
 	const [formData, setFormData] = useState({
@@ -12,6 +12,14 @@ export default function ContactForm() {
 	})
 
 	const [submitted, setSubmitted] = useState(false)
+	const [hasSubmitted, setHasSubmitted] = useState(false)
+
+	useEffect(() => {
+		const isSubmitted = localStorage.getItem("contactSubmission")
+		if (isSubmitted) {
+			setHasSubmitted(true)
+		}
+	}, [])
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
 		const { name, value } = e.target
@@ -27,6 +35,7 @@ export default function ContactForm() {
 		localStorage.setItem("contactSubmission", "true")
 
 		setSubmitted(true)
+		setHasSubmitted(true)
 		setFormData({
 			name: "",
 			email: "",
@@ -36,7 +45,17 @@ export default function ContactForm() {
 			message: "",
 		})
 		await handleFormSubmit({ data: formData })
-		setTimeout(() => setSubmitted(false), 5000)
+	}
+
+	if (hasSubmitted) {
+		return (
+			<div className="bg-card border border-border rounded-lg p-12 text-center">
+				<h2 className="text-3xl font-bold text-primary mb-4">Заявку вже надіслано</h2>
+				<p className="text-foreground text-lg">
+					Ви вже надсилали форму. Ми отримали ваші дані і зв'яжемося з вами найближчим часом.
+				</p>
+			</div>
+		)
 	}
 
 	return (
